@@ -244,7 +244,7 @@ h2.sc{font-size:19px;margin:8px 0 2px}
 
 <!-- ============ SCREENS ============ -->
 <div class="screen on" id="sc-home">
-  <h2 class="sc">Home — the uncensored feed</h2>
+  <div class="row" id="profileHead" style="margin:6px 0 2px"></div>
   <div class="sub">Post updates, raise problems, offer solutions, run your business. No shadow-bans — the feed belongs to the people.</div>
   <div class="row" id="statStrip" style="gap:8px;margin:10px 0;font-family:var(--mono)"></div>
   <div class="crew-banner" onclick="openSheet('crew')">
@@ -567,6 +567,11 @@ function addPost(){
 function likePost(i){S.posts[i].likes++;save();renderFeed()}
 function votePost(i,v){S.posts[i].score=(S.posts[i].score||0)+v;save();renderFeed()}
 function renderStats(){
+  const ph=document.getElementById('profileHead');
+  if(ph&&S.user){const myPosts=S.posts.filter(p=>p.by===S.user.name).length;
+    ph.innerHTML=`<div class="av" style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--cyan),var(--purple));display:flex;align-items:center;justify-content:center;font-weight:bold;color:#04070d;font-size:22px;border:2px solid var(--green)">${esc(S.user.name[0])}</div>
+    <div><h2 class="sc" style="margin:0">Welcome, ${esc(S.user.name.split(' ')[0])} 👋</h2>
+    <div class="mono muted" style="font-size:11px">${S.myRole?'⚓ '+esc(S.myRole.split('—')[0]):(S.myCreator?'🎬 Creator':'⬡ Citizen')} · ${S.myShares.toLocaleString()} NDS · ${myPosts} posts · ${S.user.city||''}</div></div>`;}
   const el=document.getElementById('statStrip');if(!el)return;
   const c=myCom();
   const st=[['👥',c?c.members:'—','members'],['🗳️',S.props.filter(p=>p.status==='open').length,'open votes'],
