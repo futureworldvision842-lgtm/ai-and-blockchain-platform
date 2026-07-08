@@ -245,6 +245,7 @@ h2.sc{font-size:19px;margin:8px 0 2px}
 <!-- ============ SCREENS ============ -->
 <div class="screen on" id="sc-home">
   <div class="row" id="profileHead" style="margin:6px 0 2px"></div>
+  <div id="storyRail" style="display:flex;gap:14px;overflow-x:auto;padding:10px 2px;scrollbar-width:none"></div>
   <div class="sub">Post updates, raise problems, offer solutions, run your business. No shadow-bans — the feed belongs to the people.</div>
   <div class="row" id="statStrip" style="gap:8px;margin:10px 0;font-family:var(--mono)"></div>
   <div class="crew-banner" onclick="openSheet('crew')">
@@ -572,6 +573,17 @@ function renderStats(){
     ph.innerHTML=`<div class="av" style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--cyan),var(--purple));display:flex;align-items:center;justify-content:center;font-weight:bold;color:#04070d;font-size:22px;border:2px solid var(--green)">${esc(S.user.name[0])}</div>
     <div><h2 class="sc" style="margin:0">Welcome, ${esc(S.user.name.split(' ')[0])} 👋</h2>
     <div class="mono muted" style="font-size:11px">${S.myRole?'⚓ '+esc(S.myRole.split('—')[0]):(S.myCreator?'🎬 Creator':'⬡ Citizen')} · ${S.myShares.toLocaleString()} NDS · ${myPosts} posts · ${S.user.city||''}</div></div>`;}
+  const sr=document.getElementById('storyRail');
+  if(sr&&!sr.children.length){
+    const items=[['🗳️','Vote','openSheet("newprop")'],['💬','Chat','openSheet("chat")'],['📰','News','openSheet("news")'],
+      ['🎮','Game','openSheet("game")'],['🆘','Relief','openSheet("relief")'],['🏴‍☠️','Crew','openSheet("crew")'],
+      ['🛍️','Market','openSheet("market")'],['🚗','Ride','openSheet("ride")'],['🏛️','Panels','openSheet("panels")']];
+    sr.innerHTML=items.map(([i,l,fn])=>`<div onclick='${fn}' style="text-align:center;cursor:pointer;flex-shrink:0">
+      <div style="width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;
+      background:linear-gradient(135deg,#0a1322,#081020);border:2px solid transparent;
+      background-clip:padding-box;box-shadow:0 0 0 2px rgba(25,224,255,.5),0 0 14px rgba(25,224,255,.25)">${i}</div>
+      <div style="font-size:9.5px;color:var(--muted);margin-top:4px;letter-spacing:.5px">${l}</div></div>`).join('');
+  }
   const el=document.getElementById('statStrip');if(!el)return;
   const c=myCom();
   const st=[['👥',c?c.members:'—','members'],['🗳️',S.props.filter(p=>p.status==='open').length,'open votes'],
