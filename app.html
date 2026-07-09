@@ -193,6 +193,73 @@ h2.sc{font-size:19px;margin:8px 0 2px}
   #rightRail{display:block;position:fixed;top:118px;right:max(14px,calc(50% - 640px));width:300px;
     max-height:calc(100vh - 140px);overflow-y:auto}
 }
+/* ============ FACEBOOK-STYLE LIGHT THEME (overrides) ============ */
+:root{--bg:#f0f2f5;--bg2:#ffffff;--panel:#ffffff;--panel2:#ffffff;--line:#dddfe2;
+  --cyan:#1877f2;--green:#42b72a;--gold:#e8a017;--red:#f02849;--purple:#7b3ff2;
+  --text:#050505;--muted:#65676b}
+body{background:var(--bg);background-image:none;color:var(--text)}
+.top{background:#fff;border-bottom:1px solid var(--line);box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.top .logo{background:linear-gradient(90deg,#1877f2,#0a5dc2);-webkit-background-clip:text;background-clip:text;filter:none}
+.top .demo{color:#e8a017;border-color:#e8a017}
+.top .ai-btn{background:#f0f2f5;color:#7b3ff2;border-color:#e4d9ff}
+.ticker{background:#fff;border-bottom:1px solid var(--line);color:#65676b}
+.card,.post,.branch,.prob,.role{background:#fff;border-color:var(--line);box-shadow:0 1px 2px rgba(0,0,0,.08);backdrop-filter:none}
+input,textarea,select{background:#f0f2f5;border-color:var(--line);color:var(--text)}
+input::placeholder,textarea::placeholder{color:#8a8d91}
+.b-green{background:#1877f2;color:#fff;box-shadow:0 2px 8px rgba(24,119,242,.3)}
+.b-cyan{border-color:#1877f2;color:#1877f2;background:#fff}
+.b-gold{border-color:#e8a017;color:#b57c0a;background:#fff}
+.b-red{border-color:#f02849;color:#f02849;background:#fff}
+.b-purple{background:#7b3ff2;color:#fff}
+.bnav{background:#fff;border-color:var(--line);box-shadow:0 -1px 6px rgba(0,0,0,.08)}
+.bnav button{color:#65676b}.bnav button.on{color:#1877f2;background:#e7f0fe}
+.sheet{background:rgba(0,0,0,.45)}.sheet .box{background:#fff;border-color:var(--line)}
+.sheet .grab{background:#ced0d4}
+.msg.me{background:#1877f2;border:none;color:#fff}
+.msg.ai{background:#f0f2f5;border:1px solid var(--line);color:#050505}
+.msg.ai b{color:#7b3ff2}
+.toast{background:#050505;border:none;color:#fff}
+.wallet-hero{background:linear-gradient(135deg,#1877f2,#0a4bab);border:none;color:#fff}
+.wallet-hero .muted,.wallet-hero .addr{color:#cfe2ff}
+.wallet-hero .bal{color:#fff}
+.own-card{background:linear-gradient(135deg,#7b3ff2,#4a1fb8);border:none;color:#fff}
+.own-card .big{color:#ffd166}.own-card .mono,.own-card .muted{color:#e2d6ff}
+.crew-banner{background:linear-gradient(120deg,#fff7e8,#fef3ff);border-color:#f0dcc0}
+.crew-banner h3{color:#b57c0a}
+.crew-member .cav{background:#fff7e8;border-color:#e8a017;box-shadow:none}
+.alert{background:#fff0f0;border-color:#f5b3bd}
+.mkt{border-bottom:1px solid #f0f2f5}
+.ledger .e{border-bottom:1px solid #f0f2f5}.ledger .t{color:#8a8d91}.ledger .a{color:#1877f2}
+.hier b{color:#1877f2}
+.svc{background:#fff;border-color:var(--line)}
+.chat{background:transparent}
+#mapCv{background:#0b1524;border-color:var(--line)}  /* map stays dark = looks premium */
+.pill.c{background:#e7f0fe;color:#1877f2}.pill.g{background:#e8f5e3;color:#2b8a1d}
+.pill.o{background:#fdf3dc;color:#b57c0a}.pill.r{background:#fde8ec;color:#d92846}.pill.p{background:#f0e7fe;color:#6d2ee6}
+.post .av{background:linear-gradient(135deg,#1877f2,#7b3ff2);color:#fff}
+.votebar{background:#e4e6eb}
+/* Facebook-style signup */
+#onboard{background:var(--bg);max-width:none;padding:20px}
+#onboard .progress i{background:#dbe2ec}#onboard .progress i.done{background:#1877f2}
+#onboard h1 em{background:none;color:#1877f2;-webkit-text-fill-color:#1877f2;animation:none}
+.fb-wrap{display:flex;flex-direction:column;gap:26px;max-width:980px;margin:4vh auto 0}
+.fb-logo{font-size:38px;font-weight:bold;color:#1877f2;letter-spacing:-1px}
+.fb-brand h1{color:#1c1e21}
+.fb-feat{font-size:13.5px;color:#3a3b3c;padding:7px 0;border-bottom:1px solid #e8eaee}
+.fb-card{background:#fff;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,.15);padding:22px 20px}
+.fb-card input{background:#fff;border:1px solid #ccd0d5;font-size:15px;padding:13px}
+.fb-card input:focus{border-color:#1877f2;box-shadow:0 0 0 2px #e7f0fe}
+.fb-card .b-green{background:#42b72a;box-shadow:0 2px 8px rgba(66,183,42,.3)}
+.otp-box input{background:#fff;border:1px solid #ccd0d5}
+.sms{background:#e7f0fe;border-color:#bcd6f8;color:#1c1e21}
+.sms b{color:#1877f2!important}
+.seed span{background:#f0f2f5;border-color:#ccd0d5;color:#b57c0a}
+@media(min-width:900px){
+  .fb-wrap{flex-direction:row;align-items:center;gap:60px;min-height:78vh;margin-top:0}
+  .fb-brand{flex:1.2}.fb-card{flex:1;max-width:400px}
+  .fb-logo{font-size:48px}
+  .fb-brand h1{font-size:27px!important}
+}
 </style>
 </head>
 <body>
@@ -202,16 +269,33 @@ h2.sc{font-size:19px;margin:8px 0 2px}
   <div class="progress"><i id="pg1" class="done"></i><i id="pg2"></i><i id="pg3"></i><i id="pg4"></i></div>
 
   <div class="step on" id="st1">
-    <div class="pill o mono">DEMO — data stays on YOUR phone</div>
-    <h1>One app.<br><em>Owned by everyone.</em></h1>
-    <p class="muted" style="margin:10px 0 20px">Social + governance + wallet + services + science —
-    a people-owned platform where YOUR device is the database. No datacenter reads your life.
-    Create your demo account:</p>
-    <input id="obName" placeholder="Full name — پورا نام" maxlength="30">
-    <input id="obPhone" placeholder="Phone — e.g. 03XX-XXXXXXX" maxlength="16">
-    <input id="obEmail" placeholder="Email" maxlength="50">
-    <button class="b-green" style="width:100%;margin-top:12px" onclick="obSendCode()">Send verification code →</button>
-    <p class="muted" style="margin-top:14px;font-size:11.5px">🔒 Decentralized by design: this demo stores everything in your browser only — exactly how the real platform keeps your keys on your device.</p>
+    <div class="fb-wrap">
+      <div class="fb-brand">
+        <div class="fb-logo">⬡ newdawn</div>
+        <h1 style="font-size:24px;font-weight:normal;line-height:1.35;margin:10px 0 18px">
+          Ek hi app — social, governance, wallet, business, science.<br>
+          <em style="font-weight:bold">Owned by the people. Run by your votes.</em></h1>
+        <div class="fb-feat">🗳️ <b>Apni society ke faisley</b> — vote, veto, sab members ki marzi se</div>
+        <div class="fb-feat">👛 <b>Apna crypto wallet</b> — keys aapke phone par, koi freeze nahi kar sakta</div>
+        <div class="fb-feat">📖 <b>Har rupya transparent</b> — open ledger, receipts, live audit</div>
+        <div class="fb-feat">🛍️ <b>Apna business chalao</b> — 0% platform tax, seedha wallet mein</div>
+        <div class="fb-feat">🎮 <b>Science game khelo</b> — asli problems solve karo, rewards kamao</div>
+        <div class="fb-feat">🔒 <b>Aapka phone = database</b> — koi datacenter aapki zindagi nahi padhta</div>
+      </div>
+      <div class="fb-card">
+        <h3 style="font-size:17px;margin-bottom:2px">Create a new account</h3>
+        <p class="muted" style="font-size:12.5px;margin-bottom:12px">It's quick, free — and it's YOURS.</p>
+        <input id="obName" placeholder="Full name — پورا نام" maxlength="30">
+        <input id="obPhone" placeholder="Mobile number" maxlength="16">
+        <input id="obEmail" placeholder="Email address" maxlength="50">
+        <button class="b-green" style="width:100%;margin-top:12px;font-size:16px;padding:13px" onclick="obSendCode()">Sign Up</button>
+        <div style="text-align:center;margin-top:14px;border-top:1px solid var(--line);padding-top:14px">
+          <span class="muted" style="font-size:12px">Already made an account on this device? It auto-opens.</span><br>
+          <a href="index.html" style="font-size:13px;font-weight:bold">Learn about the mission →</a>
+        </div>
+        <p class="muted" style="margin-top:12px;font-size:10.5px;text-align:center">🔒 DEMO — data stays in your browser only, exactly how the real platform keeps keys on your device.</p>
+      </div>
+    </div>
   </div>
 
   <div class="step" id="st2">
