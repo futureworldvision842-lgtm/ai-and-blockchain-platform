@@ -152,18 +152,29 @@ function projectForm(){return `<form data-generic class="form-grid"><label>Appro
 function addAI(text){const div=document.createElement('div');div.className='ai-msg';div.textContent=text;$('#jarvisChat').appendChild(div);$('#jarvisChat').scrollTop=$('#jarvisChat').scrollHeight}
 var JARVIS_SYS='You are JARVIS, the AI assistant inside G.A.I.G.S. (Global AI Governance System) by Muhammad Qureshi — a people-owned civic platform: societies govern themselves by vote, transparent treasuries, open ledgers, AI that informs but NEVER decides (you cannot vote or move funds). Answer in the user\'s language (English/Roman-Urdu). Be concrete, concise, help explain proposals, evidence, funds, services and rules. Never invent facts.';
 function _jarvisMock(prompt){const p=prompt.toLowerCase();if(p.includes('water'))return 'The water proposal requests ₨1.85 million for a solar-assisted filtration unit. 12 evidence items, 64% turnout, one missing vendor warranty. Benefits: clean water, lower cost. Risks: maintenance ownership, replacement-filter costs.';if(p.includes('fund')||p.includes('treasury'))return 'Society treasury: ₨2.84M total, ₨1.42M reserved for approved projects. Latest ₨175,000 payment is tied to water-project milestone 1 with an uploaded receipt.';if(p.includes('work')||p.includes('service'))return 'Three matches: short-form video editing 1.2 km away, a remote AI automation consultation, and a community training mission. I can compare budget, travel and reputation.';if(p.includes('problem'))return 'Tell me the location, what happened, who is affected, your evidence and the outcome you want. I will draft a structured problem report for your review before publishing.';return 'I can explain proposals, compare options, find missing evidence and open the public ledger — using the records and permissions in this demo. I cannot vote or move funds.';}
+function jarvisSpeak(text){try{if(!('speechSynthesis'in window))return;window.speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(text.slice(0,600));u.rate=1.02;u.pitch=1;window.speechSynthesis.speak(u);}catch(e){}}
+function jarvisContextLine(){try{var u=(state&&state.user)?state.user:{};return 'User: '+(u.name||'guest')+', city '+(u.city||'?')+', skills '+(u.skills||'?')+'. Current view: '+(typeof getScopeLabel==='function'?getScopeLabel():'')+'. Active water proposal: ₨1.85M, 64% turnout, 1 missing warranty. Treasury ₨2.84M (₨1.42M reserved).';}catch(e){return '';}}
 function askJarvis(prompt){
   var u=document.createElement('div');u.className='user-msg';u.textContent=prompt;$('#jarvisChat').appendChild(u);
   var t=document.createElement('div');t.className='ai-msg';t.textContent='…';$('#jarvisChat').appendChild(t);$('#jarvisChat').scrollTop=$('#jarvisChat').scrollHeight;
   var useFn=!location.hostname.includes('localhost')&&location.protocol!=='file:';
-  if(!useFn){t.textContent=_jarvisMock(prompt);return;}
+  if(!useFn){var r=_jarvisMock(prompt);t.textContent=r;jarvisSpeak(r);return;}
   fetch('/.netlify/functions/jarvis',{method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({system_instruction:{parts:[{text:JARVIS_SYS}]},contents:[{role:'user',parts:[{text:prompt}]}]})})
+    body:JSON.stringify({system_instruction:{parts:[{text:JARVIS_SYS+'\n\n[CONTEXT] '+jarvisContextLine()}]},contents:[{role:'user',parts:[{text:prompt}]}]})})
     .then(function(r){return r.json()}).then(function(j){
       var a=(j.candidates&&j.candidates[0].content.parts.map(function(p){return p.text||''}).join(''))||_jarvisMock(prompt);
-      t.textContent=a;$('#jarvisChat').scrollTop=$('#jarvisChat').scrollHeight;
-    }).catch(function(){t.textContent=_jarvisMock(prompt);});
+      t.textContent=a;$('#jarvisChat').scrollTop=$('#jarvisChat').scrollHeight;jarvisSpeak(a);
+    }).catch(function(){var r=_jarvisMock(prompt);t.textContent=r;jarvisSpeak(r);});
 }
+// Voice input (browser speech recognition) — the mic button makes JARVIS listen.
+(function(){var SR=window.SpeechRecognition||window.webkitSpeechRecognition;var btn=document.getElementById('voiceBtn');if(!btn)return;
+  if(!SR){btn.addEventListener('click',function(){var i=document.getElementById('jarvisInput');if(i)i.focus();});return;}
+  var rec=new SR();rec.lang='en-US';rec.interimResults=false;var listening=false;
+  btn.addEventListener('click',function(){try{if(listening){rec.stop();return;}window.speechSynthesis&&window.speechSynthesis.cancel();rec.start();listening=true;btn.textContent='🔴';}catch(e){}});
+  rec.onresult=function(e){var txt=e.results[0][0].transcript;var i=document.getElementById('jarvisInput');if(i)i.value=txt;askJarvis(txt);};
+  rec.onend=function(){listening=false;btn.textContent='🎙';};
+  rec.onerror=function(){listening=false;btn.textContent='🎙';};
+})();
 $$('[data-auth-tab]').forEach(b=>b.addEventListener('click',()=>{$$('[data-auth-tab]').forEach(x=>x.classList.toggle('active',x===b));$$('.auth-form').forEach(x=>x.classList.remove('active'));$('#'+b.dataset.authTab+'Form').classList.add('active')}));
 $('#signupForm').addEventListener('submit',e=>{e.preventDefault();$$('.auth-form').forEach(x=>x.classList.remove('active'));$('#otpForm').classList.add('active')});
 $('#loginForm').addEventListener('submit',e=>{e.preventDefault();createDemoUser();render()});
