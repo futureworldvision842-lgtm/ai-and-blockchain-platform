@@ -347,6 +347,7 @@ input::placeholder,textarea::placeholder{color:#8a8d91}
   <div id="storyRail" style="display:flex;gap:14px;overflow-x:auto;padding:10px 2px;scrollbar-width:none"></div>
   <div class="sub">Post updates, raise problems, offer solutions, run your business. No shadow-bans — the feed belongs to the people.</div>
   <div class="row" id="statStrip" style="gap:8px;margin:10px 0;font-family:var(--mono)"></div>
+  <div id="briefBox"></div>
   <div class="crew-banner" onclick="openSheet('crew')">
     <h3>⚓ Join the Crew — نئی دنیا کا عملہ</h3>
     <div class="muted">One Piece crew ki tarah: researcher, creator, developer, blockchain builder — har nakama
@@ -561,6 +562,19 @@ let S=(()=>{try{const d=JSON.parse(localStorage.getItem(LS));if(d&&d.coms)return
     {by:'Ali',tx:'Salam sab — water plant pass ho gaya! Volunteers chahiye Saturday ko.',t:Date.now()-36e5*3},
     {by:'Fatima',tx:'Main aa rahi hoon inshaAllah. Ledger pe funds release dekh liye — transparent system ka maza hi aur hai 🙌',t:Date.now()-36e5*2},
   ];
+  if(!S.members)S.members=[
+    {n:'Muhammad Qureshi',role:'Naib Imam · Admin',skill:'Founder'},
+    {n:'Ali Raza',role:'Member',skill:'Plumber'},
+    {n:'Fatima Noor',role:'Member',skill:'Teacher'},
+    {n:'Usman Tariq',role:'Member · Treasurer',skill:'Accountant'},
+    {n:'Bilal Ahmed',role:'Member',skill:'Electrician'},
+    {n:'Ayesha Khan',role:'Member',skill:'Doctor'},
+  ];
+  if(!S.discuss)S.discuss=[
+    {by:'Ali Raza',tx:'Street lights G-11/4 mein band hain — proposal banayein?',up:8,t:Date.now()-36e5*20},
+    {by:'Ayesha Khan',tx:'Free medical camp masjid mein — main volunteer karungi. Kaun saath hai?',up:14,t:Date.now()-36e5*6},
+    {by:'Usman Tariq',tx:'Treasury ledger sab dekh lein — is mahine 35k water plant pe gaye, sab receipts attached.',up:11,t:Date.now()-36e5*2},
+  ];
   save();
 })();
 const TOTAL_SHARES=1000000; // demo cap: Founder+Crew 50% · Users 25% · Contributors 25%
@@ -669,6 +683,13 @@ function addPost(){
   toast(type==='problem'?'⚠️ Problem raised — ab society solution pe vote kar sakti hai.':'Posted!');
 }
 function likePost(i){S.posts[i].likes++;save();renderFeed()}
+function askJarvisPost(i){openSheet('ai');setTimeout(()=>{const inp=document.getElementById('aiIn');if(inp){inp.value='Explain this issue and suggest a solution: '+S.posts[i].tx.slice(0,120);aiAsk();}},300);}
+function proposeFromPost(i){
+  S.props.unshift({id:S.seq++,title:S.posts[i].tx.slice(0,70),desc:'Raised from a community problem post by '+S.posts[i].by,
+    cost:0,author:S.user.name,tier:'Society',votes:{yes:[],no:[],veto:[]},status:'open'});
+  log('turned a problem into a proposal');save();
+  nav(document.querySelector('[data-s=society]'));toast('🏛️ Proposal created — society can now vote on it.');
+}
 function votePost(i,v){S.posts[i].score=(S.posts[i].score||0)+v;save();renderFeed()}
 function renderStats(){
   const ph=document.getElementById('profileHead');
@@ -710,8 +731,13 @@ function renderFeed(){
       <div><div class="nm">${esc(p.by)} ${TYPETAG[p.type]||''}</div><div class="mt">${ago}h ago · uncensored</div></div></div>
       <div class="tx">${esc(p.tx)}</div>
       <div class="acts"><span onclick="votePost(${i},1)">▲</span><b style="color:${(p.score||0)>=0?'var(--green)':'var(--red)'}">${p.score||0}</b><span onclick="votePost(${i},-1)">▼</span><span onclick="likePost(${i})">❤️ ${p.likes}</span><span>💬 ${p.comments.length}</span>
-      ${p.type==='business'?'<span onclick="toast(\'Demo: order placed — payment goes wallet-to-wallet, 0% cut.\')">🛒 Order</span>':''}
-      ${p.type==='problem'?'<span onclick="toast(\'Demo: escalated to society proposals for a vote.\')">🏛️ Escalate</span>':''}</div>
+      ${p.type==='business'?'<span onclick="toast(\'Demo: order placed — payment goes wallet-to-wallet, 0% cut.\')">🛒 Order</span>':''}</div>
+      ${p.type==='problem'?`<div class="row" style="gap:7px;margin-top:9px;flex-wrap:wrap">
+        <button class="b-cyan" style="flex:1;min-width:90px;padding:8px;font-size:11.5px" onclick="document.getElementById('cmt${i}').focus()">💬 Discuss</button>
+        <button class="b-purple" style="flex:1;min-width:90px;padding:8px;font-size:11.5px" onclick="askJarvisPost(${i})">✦ Ask JARVIS</button>
+        <button class="b-green" style="flex:1;min-width:90px;padding:8px;font-size:11.5px" onclick="proposeFromPost(${i})">🏛️ Create Proposal</button>
+        <button class="b-gold" style="flex:1;min-width:80px;padding:8px;font-size:11.5px" onclick="votePost(${i},1);toast('Supported — added your weight to this issue.')">🤝 Support</button>
+      </div>`:''}
       ${p.comments.map(c=>`<div class="muted" style="font-size:12.5px;margin-top:7px;border-left:2px solid var(--line);padding-left:9px"><b style="color:var(--text)">${esc(c.by)}:</b> ${esc(c.tx)}</div>`).join('')}
       <div class="row" style="margin-top:9px"><input id="cmt${i}" placeholder="Comment…" style="flex:1" maxlength="140"><button class="b-cyan" onclick="commentPost(${i})">↩</button></div>`;
     f.appendChild(d);
@@ -865,12 +891,24 @@ function renderSociety(){
       ${e.amt?`<span class="amt ${e.amt>0?'pl':'mi'}">${e.amt>0?'+':''}${e.amt.toLocaleString()} NDC</span>`:''}</div>`;
   }
   h+=`</div></div>
+  <div class="card"><h3>👥 Members (${c.members}) — everyone is an owner</h3>
+  ${S.members.map(m=>`<div class="member"><div class="av" style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--cyan),var(--purple));display:flex;align-items:center;justify-content:center;font-size:14px;color:#04070d;font-weight:bold">${esc(m.n[0])}</div>
+    <div><b style="font-size:13.5px">${esc(m.n)}</b><div class="muted" style="font-size:11px">${esc(m.role)} · 🛠️ ${esc(m.skill)}</div></div></div>`).join('')}
+  <div class="muted" style="font-size:11px;margin-top:6px">+ ${Math.max(0,c.members-S.members.length)} more members</div></div>
+  <div class="card"><h3>💬 Society discussions — talk, then vote</h3>
+    <div class="row" style="margin-bottom:8px"><input id="discIn" placeholder="Start a discussion…" style="flex:1" maxlength="160"><button class="b-green" onclick="addDiscuss()">Post</button></div>
+    ${S.discuss.map((d,i)=>`<div class="post" style="margin:8px 0"><div class="row"><b style="font-size:13px">${esc(d.by)}</b></div>
+      <div style="font-size:13.5px;margin:5px 0">${esc(d.tx)}</div>
+      <div class="acts"><span onclick="S.discuss[${i}].up++;save();renderSociety()">👍 ${d.up}</span>
+      <span onclick="discToProposal(${i})">🏛️ To proposal</span></div></div>`).join('')}</div>
   <div class="card"><h3>🏛️ The branch system — like a global bank, owned by people</h3>
   <div class="hier">GLOBAL FEDERATION<br>└─ <b>Pakistan</b> (country panel)<br>&nbsp;&nbsp;&nbsp;└─ <b>${esc(c.city)}</b> (city panel)<br>
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└─ <b style="color:var(--green)">${esc(c.name.split('(')[0].trim())} ← you</b></div>
   <button class="b-cyan" style="margin-top:10px" onclick="openSheet('panels')">Open branch panels →</button></div>`;
   el.innerHTML=h;
 }
+function addDiscuss(){const el=document.getElementById('discIn');const t=el.value.trim();if(!t)return toast('Kuch likhein.');S.discuss.unshift({by:S.user.name,tx:t,up:0,t:Date.now()});save();renderSociety();toast('Discussion posted!');}
+function discToProposal(i){const d=S.discuss[i];S.props.unshift({id:S.seq++,title:d.tx.slice(0,70),desc:'From society discussion by '+d.by,cost:0,author:S.user.name,tier:'Society',votes:{yes:[],no:[],veto:[]},status:'open'});log('discussion → proposal');save();renderSociety();toast('🏛️ Proposal banaya — ab society vote karegi.');}
 function donateSoc(){
   const a=parseInt(prompt('Kitne NDC contribute karne hain? (aapke paas '+S.ndc+')','25'));
   if(!a||a<1)return;if(a>S.ndc)return toast('Balance kam hai.');
@@ -1149,7 +1187,34 @@ function renderRail(){
       <button class="b-purple" style="flex:1" onclick="openSheet('ai')">✦ AI</button></div></div>
   <div class="muted" style="font-size:10.5px;padding:4px 6px;font-family:var(--mono)">⬡ NewDawn · your device is the database · <a href="index.html">mission</a></div>`;
 }
-function renderAll(){renderStats();renderFeed();renderWallet();renderSociety();renderMapList();renderAlert();renderRail()}
+function renderBrief(){
+  const el=document.getElementById('briefBox');if(!el||!S.user)return;
+  const h=new Date().getHours();
+  const greet=h<12?'Good morning':h<17?'Good afternoon':'Good evening';
+  const c=S.socId?myCom():null;
+  const openVotes=S.props.filter(p=>p.status==='open').length;
+  const cards=[
+    ['🗳️',(openVotes||1)+' vote'+((openVotes||1)>1?'s':'')+' need you',c?c.name.split('(')[0].trim():'your society','openSheet(\'newprop\')'],
+    ['⚠️','2 nearby issues','need evidence & support','nav(document.querySelector(\'[data-s=home]\'))'],
+    ['🏗️','Community project 62%','on track — see the ledger','nav(document.querySelector(\'[data-s=society]\'))'],
+    ['🆘','1 global emergency',DISASTER.title.replace(/[🌊 ]/g,'').slice(0,22),'openSheet(\'relief\')'],
+  ];
+  el.innerHTML=`
+  <div class="card" style="background:linear-gradient(135deg,#0a2a35,#0d1f33);border-color:#14506b">
+    <h3 style="color:var(--gold);font-size:16px">${greet}, ${esc(S.user.name.split(' ')[0])}. Here's what needs your attention.</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:9px;margin-top:10px">
+      ${cards.map(([i,t,s,fn])=>`<div onclick='${fn}' style="cursor:pointer;background:rgba(6,16,32,.6);border:1px solid var(--line);border-radius:12px;padding:11px">
+        <div style="font-size:18px">${i}</div><div style="font-size:12.5px;font-weight:600;margin-top:3px">${t}</div>
+        <div class="muted" style="font-size:10.5px">${esc(s)}</div></div>`).join('')}
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;margin-top:11px;padding:9px 11px;background:rgba(199,146,255,.1);border:1px solid rgba(199,146,255,.3);border-radius:12px">
+      <span style="font-size:16px">✦</span>
+      <span style="font-size:12px;color:var(--muted)">JARVIS: I found a proposal in your community — want a 30-sec explanation?</span>
+      <button class="b-purple" style="margin-left:auto;padding:6px 11px;font-size:11px" onclick="openSheet('ai')">Ask</button>
+    </div>
+  </div>`;
+}
+function renderAll(){renderStats();renderBrief();renderFeed();renderWallet();renderSociety();renderMapList();renderAlert();renderRail()}
 renderObCity();
 if(S.user&&S.user.addr&&S.socId){document.getElementById('onboard').style.display='none'}
 renderAll();drawMap();fetchMarkets();
