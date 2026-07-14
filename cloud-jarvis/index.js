@@ -6,7 +6,17 @@ const { default: makeWASocket, useMultiFileAuthState, DisconnectReason } =
   require('@whiskeysockets/baileys');
 const qrcode = require('qrcode-terminal');
 const https = require('https');
+const http = require('http');
 const fs = require('fs');
+
+// Tiny HTTP server so free hosts (Render/Koyeb) see this as a live "web service"
+// and an uptime pinger (cron-job.org) can keep it awake. Also shows the QR link.
+let lastQR = '';
+http.createServer((req, res) => {
+  res.writeHead(200, { 'Content-Type': 'text/html' });
+  res.end('<h2>🤖 Cloud JARVIS</h2><p>Status: ' + (ready ? 'ONLINE ✅' : 'connecting…') +
+    '</p>' + (lastQR && !ready ? '<p>Scan pending — check server logs for QR.</p>' : ''));
+}).listen(process.env.PORT || 3000, () => console.log('[JARVIS] keep-alive HTTP up'));
 
 const KEY = process.env.GEMINI_KEY || '';
 const BOSS = (process.env.BOSS_NUMBER || '923468053268').replace(/\D/g, '');
@@ -57,7 +67,7 @@ async function start() {
   sock.ev.on('creds.update', saveCreds);
   sock.ev.on('connection.update', (u) => {
     const { connection, lastDisconnect, qr } = u;
-    if (qr) { console.log('\n[JARVIS] Scan this QR in WhatsApp > Linked Devices:\n'); qrcode.generate(qr, { small: true }); }
+    if (qr) { lastQR = qr; console.log('\n[JARVIS] Scan this QR in WhatsApp > Linked Devices:\n'); qrcode.generate(qr, { small: true }); }
     if (connection === 'open') { ready = true; console.log('[JARVIS] ONLINE 24/7 — connected.'); }
     if (connection === 'close') {
       ready = false;
